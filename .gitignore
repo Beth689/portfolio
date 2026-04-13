@@ -1,0 +1,19 @@
+# Ignore macOS files
+.DS_Store
+
+# Ignore dependencies
+node_modules
+portfolio-frontend/node_modules
+portfolio-backend/node_modules
+
+# Ignore Next.js build output
+portfolio-frontend/.next
+.next
+
+# Ignore environment variables
+.env
+.env.local
+
+# Build info
+dist
+build

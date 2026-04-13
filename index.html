@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elizabeth Conklin | Portfolio</title>
+  <style>
+    /* Basic Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #333;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #fff;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      transition: color 0.2s ease;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 280px;
+      height: 100%;
+      padding: 50px 40px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      background: #fff;
+    }
+
+    .logo {
+      font-family: 'Georgia', Times, serif;
+      font-size: 26px;
+      font-weight: normal;
+      margin-bottom: 60px;
+      color: #111;
+      letter-spacing: 0.5px;
+    }
+
+    .main-nav, .sub-nav {
+      list-style: none;
+      margin-bottom: 40px;
+    }
+
+    .main-nav li {
+      margin-bottom: 16px;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .main-nav a.active {
+      font-weight: bold;
+      color: #999;
+    }
+
+    .sub-nav li {
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    /* Artwork Details Layer */
+    .image-details {
+      margin-top: auto; 
+      /* Push down to bottom or follow immediately after some margin */
+    }
+
+    .artwork-title {
+      font-family: 'Georgia', Times, serif;
+      font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .artwork-info {
+      font-size: 13px;
+      color: #666;
+      margin: 10px 0;
+      line-height: 1.4;
+    }
+
+    .artwork-controls {
+      margin-top: 30px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .artwork-controls a:hover {
+      color: #000;
+    }
+
+    .thumbnail-toggle {
+      margin-top: 25px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .thumbnail-toggle a:hover {
+      color: #000;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex-grow: 1;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fafafa;
+    }
+
+    .image-container {
+      max-width: 90%;
+      max-height: 90%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.4s ease;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+    }
+
+    /* Thumbnails View */
+    .thumbnails-container {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #fafafa;
+      padding: 60px;
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 40px;
+      overflow-y: auto;
+      align-content: start;
+    }
+
+    .thumbnails-container.active {
+      display: grid;
+    }
+
+    .thumbnail-wrapper {
+      cursor: pointer;
+      aspect-ratio: 1; /* Square thumbnails */
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eee;
+      transition: opacity 0.2s;
+    }
+
+    .thumbnail-wrapper:hover {
+      opacity: 0.8;
+    }
+
+    .thumbnail-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <h1 class="logo">Elizabeth Conklin</h1>
+    
+    <nav>
+      <ul class="main-nav">
+        <li><a href="#" class="active">Drawing</a></li>
+        <li><a href="#">Painting</a></li>
+        <li><a href="#">Sculpture/Installation</a></li>
+      </ul>
+      <ul class="sub-nav">
+        <li><a href="#">CV</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+    
+    <!-- Using inline-style placeholder values before JS loads -->
+    <div class="image-details" id="image-details" style="opacity: 0; transition: opacity 0.3s ease;">
+      <div class="artwork-title" id="art-title">self portrait</div>
+      <div class="artwork-info" id="art-medium">pencil and watercolour on paper</div>
+      <div class="artwork-info" id="art-dimensions">10 x 12"</div>
+      <div class="artwork-info" id="art-year">2016</div>
+      
+      <div class="artwork-controls">
+        <a href="#" id="prev-btn">PREV</a> / <a href="#" id="next-btn">NEXT</a>
+      </div>
+      <div class="thumbnail-toggle">
+        <a href="#" id="toggle-thumbnails">SHOW THUMBNAILS</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="image-container" id="image-container">
+      <img id="main-image" src="" alt="Artwork">
+    </div>
+    <div class="thumbnails-container" id="thumbnails-container">
+      <!-- Thumbnails injected here -->
+    </div>
+  </main>
+
+  <script>
+    const artworks = [
+      {
+        src: "SquarespaceImages/bethconklin_selfportrait_1500pixelsw.jpg",
+        title: "self portrait",
+        medium: "pencil and watercolour on paper",
+        dimensions: '10 x 12"',
+        year: "2016"
+      },
+      {
+        src: "SquarespaceImages/bethconklin_through2.jpg",
+        title: "through 2",
+        medium: "pencil and watercolour on paper",
+        dimensions: '12 x 16"',
+        year: "2018"
+      },
+      {
+        src: "SquarespaceImages/bethconklin_through4.jpg",
+        title: "through 4",
+        medium: "pencil and watercolour on paper",
+        dimensions: '12 x 16"',
+        year: "2018"
+      },
+      {
+        src: "SquarespaceImages/bethconklin_apothecary_1500pixelsw.jpg",
+        title: "apothecary",
+        medium: "pencil and watercolour on paper",
+        dimensions: '15 x 20"',
+        year: "2017"
+      },
+      {
+        src: "SquarespaceImages/bethconklin_untitled_version4.jpg",
+        title: "untitled version 4",
+        medium: "pencil and watercolour on paper",
+        dimensions: '8 x 10"',
+        year: "2015"
+      },
+      {
+        src: "SquarespaceImages/bluehand.jpg",
+        title: "blue hand",
+        medium: "pencil and watercolour on paper",
+        dimensions: '11 x 14"',
+        year: "2019"
+      },
+      {
+        src: "SquarespaceImages/fourpiece.jpg",
+        title: "four piece",
+        medium: "pencil and watercolour on paper",
+        dimensions: '20 x 24"',
+        year: "2020"
+      },
+      {
+        src: "SquarespaceImages/goldleaf.jpg",
+        title: "gold leaf",
+        medium: "pencil and watercolour on paper",
+        dimensions: '10 x 12"',
+        year: "2021"
+      },
+      {
+        src: "SquarespaceImages/somafinaldetail.jpg",
+        title: "soma final detail",
+        medium: "pencil and watercolour on paper",
+        dimensions: '16 x 20"',
+        year: "2022"
+      },
+      {
+        src: "SquarespaceImages/through_1retouched.jpg",
+        title: "through 1",
+        medium: "pencil and watercolour on paper",
+        dimensions: '12 x 16"',
+        year: "2018"
+      },
+      {
+        src: "SquarespaceImages/through_3retouched.jpg",
+        title: "through 3",
+        medium: "pencil and watercolour on paper",
+        dimensions: '12 x 16"',
+        year: "2018"
+      }
+    ];
+
+    let currentIndex = 0;
+    let showThumbnails = false;
+
+    // DOM Elements
+    const mainImage = document.getElementById('main-image');
+    const artTitle = document.getElementById('art-title');
+    const artMedium = document.getElementById('art-medium');
+    const artDimensions = document.getElementById('art-dimensions');
+    const artYear = document.getElementById('art-year');
+    
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const toggleBtn = document.getElementById('toggle-thumbnails');
+    
+    const thumbnailContainer = document.getElementById('thumbnails-container');
+    const imageContainer = document.getElementById('image-container');
+    const imageDetails = document.getElementById('image-details');
+
+    function updateView() {
+      const art = artworks[currentIndex];
+      
+      // fade out
+      imageContainer.style.opacity = 0;
+      
+      setTimeout(() => {
+        mainImage.src = art.src;
+        artTitle.innerText = art.title;
+        artMedium.innerText = art.medium;
+        artDimensions.innerText = art.dimensions;
+        artYear.innerText = art.year;
+        
+        // fade in
+        imageContainer.style.opacity = 1;
+        imageDetails.style.opacity = 1; 
+      }, 300);
+      
+      preloadNext();
+    }
+
+    function initThumbnails() {
+      thumbnailContainer.innerHTML = '';
+      artworks.forEach((art, index) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'thumbnail-wrapper';
+        
+        const img = document.createElement('img');
+        img.src = art.src;
+        img.loading = 'lazy';
+        img.alt = art.title;
+        
+        wrap.appendChild(img);
+        
+        // Click handler to select image from thumbnails
+        wrap.addEventListener('click', () => {
+          currentIndex = index;
+          toggleThumbnailsView();
+          updateView();
+        });
+        
+        thumbnailContainer.appendChild(wrap);
+      });
+    }
+
+    function toggleThumbnailsView() {
+      showThumbnails = !showThumbnails;
+      if (showThumbnails) {
+        thumbnailContainer.classList.add('active');
+        imageContainer.style.opacity = 0;
+        setTimeout(() => imageContainer.style.display = 'none', 400);
+        toggleBtn.innerText = 'HIDE THUMBNAILS';
+      } else {
+        thumbnailContainer.classList.remove('active');
+        imageContainer.style.display = 'flex';
+        toggleBtn.innerText = 'SHOW THUMBNAILS';
+        updateView(); // will handle opacity fade-in
+      }
+    }
+
+    function preloadNext() {
+      const nextIndex = (currentIndex + 1) % artworks.length;
+      const preloadImg = new Image();
+      preloadImg.src = artworks[nextIndex].src;
+    }
+
+    // Event Listeners
+    prevBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (showThumbnails) return;
+      currentIndex = (currentIndex === 0) ? artworks.length - 1 : currentIndex - 1;
+      updateView();
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (showThumbnails) return;
+      currentIndex = (currentIndex === artworks.length - 1) ? 0 : currentIndex + 1;
+      updateView();
+    });
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleThumbnailsView();
+    });
+
+    // Initialize
+    initThumbnails();
+    // Preload first image then show
+    mainImage.onload = () => {
+       imageContainer.style.opacity = 1;
+       imageDetails.style.opacity = 1;
+    };
+    mainImage.src = artworks[currentIndex].src;
+    artTitle.innerText = artworks[currentIndex].title;
+    artMedium.innerText = artworks[currentIndex].medium;
+    artDimensions.innerText = artworks[currentIndex].dimensions;
+    artYear.innerText = artworks[currentIndex].year;
+
+  </script>
+</body>
+</html>
